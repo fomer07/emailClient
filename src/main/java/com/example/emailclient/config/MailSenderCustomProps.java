@@ -20,6 +20,19 @@ public class MailSenderCustomProps {
      */
     String password;
 
+    /**
+     * mail host server port
+     */
+    Integer port;
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
     public String getSmtp() {
         return smtp;
     }

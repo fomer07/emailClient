@@ -26,6 +26,8 @@ public class EmailSender {
     String senderMailAddress;
     @Value("${mail.sender.password}")
     String senderMailPassword;
+    @Value("${mail.sender.port}")
+    Integer port;
 
     public EmailSender(){
 
@@ -38,7 +40,7 @@ public class EmailSender {
     public void sendEmail(){
         Properties properties = new Properties();
         properties.put("mail.smtp.host",mailSmtpHost);
-        properties.put("mail.smtp.port",587);
+        properties.put("mail.smtp.port",port);
         Session session = Session.getInstance(properties);
         try {
             MimeMessage mimeMessage = new MimeMessage(session);
