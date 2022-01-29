@@ -42,10 +42,10 @@ public class EmailSender {
         try {
             MimeMessage mimeMessage = new MimeMessage(session);
             mimeMessage.setFrom(senderMailAddress);
-            mimeMessage.setRecipients(Message.RecipientType.CC,simpleEmailEntity.getToAddresses());
-            mimeMessage.setSubject(simpleEmailEntity.getSubject());
+            mimeMessage.setRecipients(Message.RecipientType.CC,simpleEmailEntity.toAddress());
+            mimeMessage.setSubject(simpleEmailEntity.subject());
             mimeMessage.setSentDate(new Date());
-            mimeMessage.setText(simpleEmailEntity.getBody());
+            mimeMessage.setText(simpleEmailEntity.body());
             Transport.send(mimeMessage,senderMailAddress,senderMailPassword);
             System.out.println("E-mail sent successful");
         }catch (MessagingException mex){
