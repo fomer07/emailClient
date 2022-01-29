@@ -6,6 +6,9 @@ import org.springframework.context.annotation.PropertySource;
 
 import javax.mail.*;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Properties;
 
 @Configuration
@@ -21,32 +24,116 @@ public class EmailReceiver {
     @Value("${mail.receive.imap.port}")
     Integer port;
 
+    private Store store;
+    private Session session;
+    private Folder folder;
 
-    public void getMails() {
+
+
+    /**
+     * create secure authenticated connection
+     * @return session
+     */
+    private Session createAuthenticatedSession(){
         Properties properties = new Properties();
         properties.put("mail.imap.ssl.enable",true);
+        properties.put("mail.imap.host",imap);
+        properties.put("mail.imap.port",port);
         properties.put("mail.store.protocol","imap");
-        properties.put("mail.debug",true);
-        Session session = Session.getInstance(properties);
-        try {
-            Store store = session.getStore();
-            store.connect(imap,port,address,password);
-            System.out.println(store.isConnected());
-            Folder folder = store.getFolder("INBOX");
-            folder.open(Folder.READ_ONLY);
-            System.out.println(folder.getMessageCount());
-            Message[] messages = folder.getMessages();
-            for (Message m: messages
-                 ) {
-                System.out.println(m.getSubject());
-                System.out.println(m.getContent().toString());
-                System.out.println("<----------------------->END OF EMAIL<----------------------->");
+        properties.put("mail.imap.auth",true);
+        properties.put("mail.imap.timeout","20000");
+        properties.put("mail.imap.connectiontimeout","20000");
+        this.session = Session.getInstance(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(address,password);
             }
-            folder.close(true);
+        });
+        return this.session;
+    }
+    private Store connectImapStore(){
+        try {
+            this.store = this.session.getStore();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        }
+        return this.store;
+    }
+
+
+    /**
+     *
+     * @param mbox mail box folder name
+     * @return all messages as array which belongs to given folder
+     */
+    public Message[] getMessages(String mbox) {
+        Message[] messages = null;
+        createAuthenticatedSession();
+        connectImapStore();
+        try {
+            store.connect();
+            System.out.println("is store connected: "+store.isConnected());
+            if (mbox.equals("default")){
+                folder = store.getDefaultFolder();
+            }else{
+                folder = store.getFolder(mbox);
+            }
+            folder.open(Folder.READ_ONLY);
+            int totalMessageCount= folder.getMessageCount();
+            System.out.println("total messages in "+folder.getFullName()+" "+totalMessageCount);
+            int newMessageCount = folder.getNewMessageCount();
+            System.out.println("new messages in "+folder.getFullName()+" "+newMessageCount);
+            int unreadMessageCount = folder.getUnreadMessageCount();
+            System.out.println("unread messages in "+folder.getFullName()+" "+unreadMessageCount);
+            messages = folder.getMessages();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+        return messages;
+    }
+
+    public void printMessages(Message[] messages){
+        for (Message m:
+            messages ) {
+            try {
+                System.out.println("Subject : "+m.getSubject());
+                System.out.println("From : " + Arrays.toString(m.getFrom()));
+                System.out.println("Date : " + m.getReceivedDate());
+                System.out.println("Content-type : " + m.getContentType());
+                Object content = m.getContent();
+                if (content instanceof String){
+                    System.out.println("Content as text: "+content);
+                }else {
+                    // TODO: 30/01/2022 handle multipart message body
+                }
+                System.out.println("\n");
+            } catch (MessagingException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private String getContentText(InputStream inputStream){
+        String text = null;
+        try {
+             text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return text;
+    }
+
+    public void logout(){
+        try {
+            folder.close();
             store.close();
-        } catch (MessagingException | IOException e) {
+            store = null;
+            session = null;
+        } catch (MessagingException e) {
             e.printStackTrace();
         }
     }
+
+
 
 }
