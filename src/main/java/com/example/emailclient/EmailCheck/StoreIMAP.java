@@ -1,5 +1,6 @@
 package com.example.emailclient.EmailCheck;
 
+import com.example.emailclient.services.StoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -8,7 +9,7 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Store;
 
 @Component
-public class StoreIMAP {
+public class StoreIMAP implements StoreService {
 
     private final SessionIMAP sessionIMAP;
     private Store store;
@@ -18,7 +19,8 @@ public class StoreIMAP {
         this.sessionIMAP = sessionIMAP;
     }
 
-    public Store connectImapStore(){
+    @Override
+    public Store connectStore(){
         try {
             this.store = sessionIMAP.createAuthenticatedSession().getStore();
             store.connect();
@@ -28,6 +30,7 @@ public class StoreIMAP {
         return this.store;
     }
 
+    @Override
     public void logoutStore(){
         try {
             this.store.close();
