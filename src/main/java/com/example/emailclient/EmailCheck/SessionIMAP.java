@@ -32,8 +32,8 @@ public class SessionIMAP implements SessionService {
     public Session createAuthenticatedSession(){
         Properties properties = new Properties();
         properties.put("mail.imap.starttls.enable","true");
-        properties.put("mail.imap.host","imap");
-        properties.put("mail.imap.port","port");
+        properties.put("mail.imap.host",imap);
+        properties.put("mail.imap.port",port);
         properties.put("mail.store.protocol","imap");
         properties.put("mail.imap.auth","true");
         properties.put("mail.imap.timeout","20000");
