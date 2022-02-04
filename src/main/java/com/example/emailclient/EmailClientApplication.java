@@ -18,7 +18,7 @@ public class EmailClientApplication {
         ConfigurableApplicationContext context = app.run(args);
         EmailSender emailSender = context.getBean(EmailSender.class);
         SimpleEmailEntity simpleEmailEntity = new SimpleEmailEntity(
-                "lifeisg00@protonmail.com",
+                "example@example.com",
                 "java mail",
                 "mail body");
         //emailSender.sendEmail(simpleEmailEntity);
@@ -26,7 +26,7 @@ public class EmailClientApplication {
 
         Message[] messages = emailReceiver.getMessages("INBOX");
         emailReceiver.printMessages(messages);
-        emailReceiver.logout();
+
 
 
 
