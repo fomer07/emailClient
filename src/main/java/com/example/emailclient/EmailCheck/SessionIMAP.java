@@ -31,19 +31,21 @@ public class SessionIMAP implements SessionService {
     @Override
     public Session createAuthenticatedSession(){
         Properties properties = new Properties();
-        properties.put("mail.imap.ssl.enable",true);
-        properties.put("mail.imap.host",imap);
-        properties.put("mail.imap.port",port);
+        properties.put("mail.imap.starttls.enable","true");
+        properties.put("mail.imap.host","imap");
+        properties.put("mail.imap.port","port");
         properties.put("mail.store.protocol","imap");
-        properties.put("mail.imap.auth",true);
+        properties.put("mail.imap.auth","true");
         properties.put("mail.imap.timeout","20000");
         properties.put("mail.imap.connectiontimeout","20000");
-        return Session.getInstance(properties, new Authenticator() {
+        Session session= Session.getInstance(properties, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(address, password);
             }
         });
+        session.setDebug(true);
+        return session;
     }
 
 }
