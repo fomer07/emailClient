@@ -25,9 +25,18 @@ public class FolderIMAP implements FolderService {
         try {
             this.folder = storeIMAP.connectStore().getFolder(folderName);
             folder.open(Folder.READ_ONLY);
-        } catch (MessagingException e) {
+        } catch (MessagingException | NullPointerException e){
             e.printStackTrace();
         }
+    }
+
+    public Folder[] getFolderList(){
+        try {
+            return storeIMAP.connectStore().getDefaultFolder().list();
+        } catch (MessagingException | NullPointerException e) {
+            e.printStackTrace();
+        }
+        return new Folder[0];
     }
 
     @Override
