@@ -1,9 +1,9 @@
 package com.example.emailclient.services;
 
 import javax.mail.Store;
+import java.util.Optional;
 
 public interface StoreService {
-    Store connectStore();
-    void logoutStore();
+    Optional<Store> connectStore();
 
 }
