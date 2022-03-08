@@ -10,7 +10,7 @@ import javax.mail.Session;
 import java.util.Properties;
 
 @Component
-public class SessionSMTP implements SessionService {
+public class SessionSMTP  implements SessionService {
     @Value("${mail.sender.smtp}")
     String mailSmtpHost;
     @Value("${mail.sender.address}")
@@ -19,23 +19,22 @@ public class SessionSMTP implements SessionService {
     String senderMailPassword;
     @Value("${mail.sender.port}")
     Integer port;
+
     @Override
     public Session createAuthenticatedSession() {
         Properties properties = new Properties();
         properties.put("mail.transport.protocol","smtp");
+        properties.put("mail.smtp.starttls.enable","true");
+        properties.put("mail.smtp.ssl.checkserveridentity", "true");
         properties.put("mail.smtp.host",mailSmtpHost);
         properties.put("mail.smtp.port",port);
-        properties.put("mail.smtp.starttls.enable","true");
         properties.put("mail.smtp.auth","true");
-        properties.put("mail.smtp.timeout","20000");
-        properties.put("mail.smtp.connectiontimeout","20000");
-        Session session = Session.getInstance(properties, new Authenticator() {
+
+        return Session.getInstance(properties, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(senderMailAddress,senderMailPassword);
             }
         });
-        session.setDebug(true);
-        return session;
     }
 }
