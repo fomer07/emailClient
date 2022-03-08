@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import java.util.Optional;
 
 @Component
 public class FolderIMAP implements FolderService {
 
     private final StoreIMAP storeIMAP;
-    private Folder folder;
 
     @Autowired
     public FolderIMAP(StoreIMAP storeIMAP) {
@@ -21,18 +21,25 @@ public class FolderIMAP implements FolderService {
     }
 
     @Override
-    public void getFolderInstance(String folderName) {
+    public Optional<Folder> getFolderInstance(String folderName) {
         try {
-            this.folder = storeIMAP.connectStore().getFolder(folderName);
-            folder.open(Folder.READ_ONLY);
+            if (storeIMAP.connectStore().isPresent()){
+            Folder folder = storeIMAP.connectStore().get().getFolder(folderName);
+            folder.open(Folder.READ_WRITE);
+            return Optional.of(folder);
+            }
         } catch (MessagingException | NullPointerException e){
             e.printStackTrace();
         }
+        return Optional.empty();
     }
 
+    @Override
     public Folder[] getFolderList(){
         try {
-            return storeIMAP.connectStore().getDefaultFolder().list();
+            if (storeIMAP.connectStore().isPresent()){
+                return storeIMAP.connectStore().get().getDefaultFolder().list();
+            }
         } catch (MessagingException | NullPointerException e) {
             e.printStackTrace();
         }
@@ -40,35 +47,31 @@ public class FolderIMAP implements FolderService {
     }
 
     @Override
-    public void closeFolder() {
+    public FolderMessageInfo fetchFolderInformation(String folderName) {
         try {
-            folder.close();
+            Optional<Folder> folder = getFolderInstance(folderName);
+            if (folder.isPresent()){
+                String folderFullName=folder.get().getFullName();
+                int totalMessage = folder.get().getMessageCount();
+                int newMessage = folder.get().getNewMessageCount();
+                int deletedMessageCount = folder.get().getDeletedMessageCount();
+                int unreadMessageCount=folder.get().getUnreadMessageCount();
+                boolean  hasNewMessages= folder.get().hasNewMessages();
+                return new FolderMessageInfo(folderFullName,
+                        totalMessage,newMessage,unreadMessageCount,deletedMessageCount,hasNewMessages);
+            }
         } catch (MessagingException e) {
             e.printStackTrace();
         }
+        return new FolderMessageInfo(null,0,0,0,0,false);
     }
 
     @Override
-    public FolderMessageInfo fetchFolderInformation() {
+    public Message[] getMessages(String folderName) {
         try {
-            String folderFullName=folder.getFullName();
-            int totalMessage = folder.getMessageCount();
-            int newMessage = folder.getNewMessageCount();
-            int deletedMessageCount = folder.getDeletedMessageCount();
-            int unreadMessageCount=folder.getUnreadMessageCount();
-            boolean  hasNewMessages= folder.hasNewMessages();
-            return new FolderMessageInfo(folderFullName,
-                            totalMessage,newMessage,unreadMessageCount,deletedMessageCount,hasNewMessages);
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public Message[] getMessages() {
-        try {
-            return folder.getMessages();
+            if (getFolderInstance(folderName).isPresent()){
+                return getFolderInstance(folderName).get().getMessages();
+            }
         } catch (MessagingException e) {
             e.printStackTrace();
         }
