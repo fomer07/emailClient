@@ -2,6 +2,7 @@ package com.example.emailclient.EmailSender;
 
 import com.example.emailclient.services.SessionService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import javax.mail.Authenticator;
@@ -10,6 +11,7 @@ import javax.mail.Session;
 import java.util.Properties;
 
 @Component
+@PropertySource("classpath:mailserver.properties")
 public class SessionSMTP  implements SessionService {
     @Value("${mail.sender.smtp}")
     String mailSmtpHost;
@@ -25,6 +27,7 @@ public class SessionSMTP  implements SessionService {
         Properties properties = new Properties();
         properties.put("mail.transport.protocol","smtp");
         properties.put("mail.smtp.starttls.enable","true");
+        properties.put("mail.smtp.starttls.required", "true");
         properties.put("mail.smtp.ssl.checkserveridentity", "true");
         properties.put("mail.smtp.host",mailSmtpHost);
         properties.put("mail.smtp.port",port);
