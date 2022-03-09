@@ -2,6 +2,7 @@ package com.example.emailclient.EmailCheck;
 
 import com.example.emailclient.services.SessionService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import javax.mail.Authenticator;
@@ -10,6 +11,7 @@ import javax.mail.Session;
 import java.util.Properties;
 
 @Component
+@PropertySource("classpath:mailserver.properties")
 public class SessionIMAP implements SessionService {
 
     @Value("${mail.receive.imap.imap}")
