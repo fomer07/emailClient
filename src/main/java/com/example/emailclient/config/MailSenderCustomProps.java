@@ -25,6 +25,19 @@ public class MailSenderCustomProps {
      */
     Integer port;
 
+    /**
+     * mail sender's personal name
+     */
+    String personalName;
+
+    public String getPersonalName() {
+        return personalName;
+    }
+
+    public void setPersonalName(String personalName) {
+        this.personalName = personalName;
+    }
+
     public Integer getPort() {
         return port;
     }
