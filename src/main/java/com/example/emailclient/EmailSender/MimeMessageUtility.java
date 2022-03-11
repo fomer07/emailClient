@@ -14,6 +14,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import java.util.Date;
 import java.util.List;
 
 
@@ -122,10 +123,16 @@ public class MimeMessageUtility {
             mimeMessage.setRecipients(Message.RecipientType.TO,InternetAddress.parse(simpleEmailEntity.getToAddresses()));
             mimeMessage.setSender(new InternetAddress(sessionSMTP.senderMailAddress));
             mimeMessage.setFrom(new InternetAddress(personalName + " <"+sessionSMTP.senderMailAddress+">"));
+            if (simpleEmailEntity.getReplyTo() != null) {
+                mimeMessage.setReplyTo(InternetAddress.parse(simpleEmailEntity.getReplyTo()));
+            }else {
+                mimeMessage.setReplyTo(InternetAddress.parse(sessionSMTP.senderMailAddress));
+            }
             if (simpleEmailEntity.getToCcAddresses() != null && !simpleEmailEntity.getToCcAddresses().trim().isEmpty()){
                 mimeMessage.setRecipients(Message.RecipientType.CC,InternetAddress.parse(simpleEmailEntity.getToCcAddresses()));
             }
             mimeMessage.setSubject(simpleEmailEntity.getSubject());
+            mimeMessage.setSentDate(new Date());
             mimeMessage.saveChanges();
         } catch (MessagingException e) {
             e.printStackTrace();

@@ -18,11 +18,18 @@ public class SimpleEmailEntity {
     private String toCcAddresses;
     private String subject;
     private String messageBody;
+    private String replyTo;
 
     public SimpleEmailEntity(String toAddresses, String subject, String messageBody) {
         this.toAddresses = toAddresses;
         this.subject = subject;
         this.messageBody = messageBody;
+    }
+    public SimpleEmailEntity(String toAddresses, String subject, String messageBody, String replyTo) {
+        this.toAddresses = toAddresses;
+        this.subject = subject;
+        this.messageBody = messageBody;
+        this.replyTo = replyTo;
     }
 
 
