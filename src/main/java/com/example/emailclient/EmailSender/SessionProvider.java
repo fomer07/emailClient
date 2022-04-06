@@ -1,6 +1,7 @@
 package com.example.emailclient.EmailSender;
 
 import com.example.emailclient.services.SessionService;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -12,20 +13,24 @@ import java.util.Properties;
 
 @Component
 @PropertySource("classpath:mailserver.properties")
-public class SessionSMTP  implements SessionService {
-    @Value("${mail.sender.smtp}")
-    String mailSmtpHost;
+@Getter
+public class SessionProvider implements SessionService {
+
+    @Value("${mail.sender.host}")
+    private String mailSmtpHost;
     @Value("${mail.sender.address}")
-    String senderMailAddress;
+    private String senderMailAddress;
     @Value("${mail.sender.password}")
-    String senderMailPassword;
+    private String senderMailPassword;
     @Value("${mail.sender.port}")
-    Integer port;
+    private Integer port;
+    @Value("${mail.sender.protocol")
+    private String protocol;
 
     @Override
     public Session createAuthenticatedSession() {
         Properties properties = new Properties();
-        properties.put("mail.transport.protocol","smtp");
+        properties.put("mail.transport.protocol",protocol);
         properties.put("mail.smtp.starttls.enable","true");
         properties.put("mail.smtp.starttls.required", "true");
         properties.put("mail.smtp.ssl.checkserveridentity", "true");
