@@ -10,7 +10,7 @@ public class MailSenderCustomProps {
     /**
      * mail sender smtp host server
      */
-    String smtp;
+    String host;
     /**
      * mail sender address
      */
@@ -46,12 +46,12 @@ public class MailSenderCustomProps {
         this.port = port;
     }
 
-    public String getSmtp() {
-        return smtp;
+    public String getHost() {
+        return host;
     }
 
-    public void setSmtp(String smtp) {
-        this.smtp = smtp;
+    public void setHost(String host) {
+        this.host = host;
     }
 
     public String getAddress() {
